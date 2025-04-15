@@ -9,6 +9,10 @@
   const GIF = "pea.gif";
   const COLOR = "LemonChiffon";
   
+  function sleep (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+  
   function createGif (x, y) {
     nn.create("img")
       .set({
@@ -45,6 +49,7 @@
       const x = c * colSize;
       for (let r = 0; r < numRows; r++) {
         const y = r * rowSize;
+        await sleep(5);
         createGif(x, y);
       }
     }
