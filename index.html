@@ -1,66 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-US">
   <head>
     <title>Computer Disk on Lemon Chiffon</title>
-      <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
-    </head>
-</html>
-
-<script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
-
-<script>
-  /* global nn */
-  
-  //get & use url parameters
-  const params = new URLSearchParams(location.search);
-  
-  
-  //define constant variables of gif and background color
-  const GIF = "disk.gif";
-  const COLOR = "LemonChiffon";
-  
-  function sleep (ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
-  
-  function createGif (x, y) {
-    nn.create("img")
-      .set({
-        src: `${GIF}#${Math.random()}`
-      })
-      .css({
-        position: "absolute",
-        left: x,
-        top: y,
-        imageRendering: "pixelated",
-        width: 50,
-      })
-      .addTo("body")
-  }
-
-  //always use "async" when using await
-  async function setup () {
-    nn.get("body")
-      .css({
-        backgroundColor: COLOR
-      })
-    
-    // use "await" to pause code until this line is executed
-    const gif = await nn.loadImage(GIF);
-    const num = 500;
-    let rad = 0;
-    for (let c = 0; c < num; c++) {
-      const cx = nn.width / 2; //cx stands for center x pos
-      const cy = nn.height / nn.width;  //cy stands for center y pos
-      const s = 0.3; //scale
-      const x = cx + Math.cos(c * s) * rad;
-      const y = cy + Math.sin(c * s) * rad;
-      await sleep(10);
-      createGif(x, y);
-      rad += 1.1;
+    <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
       }
-  }
+    </style>
+  </head>
+  <body>
+    <script>
+      /* global nn */
 
-  nn.on("load", setup);
+      //get & use url parameters
+      const params = new URLSearchParams(location.search);
 
-</script>
+
+      //define constant variables of gif and background color
+      const GIF = "disk.gif";
+      const COLOR = "Crimson	";
+      
+      class GifPool {
+        constructor(size) {
+          this.pool = [];
+          this.totalLoaded = 0;
+          this.size = size;
+        }
+
+
+        createGif(x, y, index) {
+          const uniqueId = `2 + (${Math.random()} * 10000) - ${Math.random()} - ${index}`;
+          const img = nn.create("img")
+            .set({
+              src: `${GIF}?v=${uniqueId}`,
+              'data-index': index,
+              'data-loading': "true"
+            })
+            .css({
+              position: "absolute",
+              left: x,
+              top: y,
+              imageRendering: "pixelated",
+              width: 75
+            });
+
+          img.addTo("body");
+
+          this.pool.push({
+            element: img,
+            id: uniqueId,
+            loaded: false,
+            index: index
+          });
+
+          const baseDelay = index * 10;
+          const randomVariance = Math.random() * 400;
+          const loadDelay = baseDelay + randomVariance;
+
+          setTimeout(() => {
+            this.markAsLoaded(uniqueId);
+          }, loadDelay);
+          return img;
+        }
+
+        markAsLoaded(id) {
+          const gif = this.pool.find(g => g.id === id);
+          if (gif && !gif.loaded) {
+            gif.loaded = true;
+            gif.element.set({"data-loading": "false"});
+            this.totalLoaded++;
+
+            if (this.totalLoaded === this.size) {
+              nn.emit("allGifsLoaded");
+            }
+          }
+        }
+      }
+      
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms))
+      }
+      
+
+      //always use "async" when using await
+      async function setup() {
+        await sleep(100);
+        
+        nn.get("body")
+          .css({
+            backgroundColor: COLOR
+          })
+
+        const num = 300;
+        const gif = new GifPool(num);
+        
+        nn.loadImage(GIF).then(() => {
+          console.log('Base GIF loaded');
+        });
+        
+        let rad = 0;
+        for (let c = 0; c < num; c++) {
+          const cx = nn.width / 2; //cx stands for center x pos
+          const cy = nn.height / 2; //cy stands for center y pos
+          const s = 0.3; //scale
+          const x = cx + Math.cos(c * s) * rad;
+          const y = cy + Math.sin(c * s) * rad;
+          await sleep(10);
+          gif.createGif(x, y, c);
+          if (c % 15 === 0) {
+            await sleep(5);
+          }
+          rad += 3.2;
+        }
+        
+         nn.on('resize', () => {
+        // Recalculate positions if needed
+          console.log('Window resized to: ' + nn.width + 'x' + nn.height);
+        });
+      }
+      nn.on("load", setup);
+    </script>
+  </body>
+</html>
