@@ -1,12 +1,22 @@
-<!-- meditation #3; mr.pea on lemon chiffon -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Computer Disk on Lemon Chiffon</title>
+      <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
+    </head>
+</html>
 
 <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
 
 <script>
   /* global nn */
   
+  //get & use url parameters
+  const params = new URLSearchParams(location.search);
+  
+  
   //define constant variables of gif and background color
-  const GIF = "pea.gif";
+  const GIF = "disk.gif";
   const COLOR = "LemonChiffon";
   
   function sleep (ms) {
@@ -23,7 +33,7 @@
         left: x,
         top: y,
         imageRendering: "pixelated",
-        width: 20,
+        width: 50,
       })
       .addTo("body")
   }
@@ -37,16 +47,17 @@
     
     // use "await" to pause code until this line is executed
     const gif = await nn.loadImage(GIF);
-    const num = 1000;
+    const num = 500;
     let rad = 0;
     for (let c = 0; c < num; c++) {
       const cx = nn.width / 2; //cx stands for center x pos
-      const cy = nn.height / 2;  //cy stands for center y pos
-      const s = 0.05; //scale
+      const cy = nn.height / nn.width;  //cy stands for center y pos
+      const s = 0.3; //scale
       const x = cx + Math.cos(c * s) * rad;
       const y = cy + Math.sin(c * s) * rad;
+      await sleep(10);
       createGif(x, y);
-      rad += 0.5;
+      rad += 1.1;
       }
   }
 
