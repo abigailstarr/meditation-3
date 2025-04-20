@@ -21,7 +21,8 @@
 
       //define constant variables of gif and background color
       const GIF = "disk.gif";
-      const COLOR = "Crimson	";
+      const COLORS = ["MediumBlue", "Crimson", "Yellow	", "Lime", "Cyan", "DeepPink", "Magenta"];
+      const COLOR = COLORS[Math.floor(Math.random() * COLORS.length)];
       
       class GifPool {
         constructor(size) {
@@ -113,7 +114,7 @@
           if (c % 15 === 0) {
             await sleep(5);
           }
-          rad += 3.2;
+          rad += 3.4;
         }
         
          nn.on('resize', () => {
